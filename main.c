@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-//pizza order by queue
+//pizza order by circular queue
 struct pizza
 {
     int id,qty;
@@ -8,21 +8,32 @@ struct pizza
     char address[30];
 
 };
-int rear=-1;
-int front=-1;
+int rear=0;
+int front=0;
 int id=1;
 
+int q_full(int n,struct pizza p[])
+{
+    if(rear==n-1 && front==0)
+    return 1;
+    else
+    return 0;
+
+}
 int q_empty()
 {
-    if(rear==front)
+    if(front==rear)
         return 1;
     else
         return 0;
 }
 void place_order(struct pizza p[],int n)
 {
-    rear++;
-    if(rear<n){
+    if(((rear+1)%n)==front){
+    printf("Order is full");
+    }
+    else{
+    rear=(rear+1)%n;
     p[rear].id=id++;
     printf("Enter the name:\n");
     scanf(" %s",&p[rear].name);
@@ -31,39 +42,40 @@ void place_order(struct pizza p[],int n)
     printf("Enter quantity:\n");
     scanf(" %d",&p[rear].qty);
     }
-    else//if rear is greater than n
-    printf("Order is full");
+
 }
-void dispatch_order(struct pizza p[])
+void dispatch_order(struct pizza p[],int n)
 {
     if(q_empty()==0)
     {
-        front++;
         printf("dispatched order is:\n");
         printf("ID:%d\n",p[front].id);
+        front=(front+1)%n;
 
     }
-    else//front==rear
+    else
         printf("no more orders to be dispatched\n");
 
 }
 
-void display(struct pizza p[])
+void display(struct pizza p[],int n)
 {
-      int i;
-      if(q_empty()==1){
-        printf("No orders pending");
-      }
-      else{
     printf("Pending orders are:\n");
-    for(i=front+1;i<=rear;i++){
+    if(rear>=front){
+    for(int i=front+1;i<=rear;i++){
     printf("ID:%d\t--\t",p[i].id);
     printf("Name:%s\t--\t",&p[i].name);
     printf("No of Pizza:%d\n",p[i].qty);
     }
     }
+    else{
+        for(int i=front+1;i<=n;i++){
+    printf("ID:%d\t--\t",p[i].id);
+    printf("Name:%s\t--\t",&p[i].name);
+    printf("No of Pizza:%d\n",p[i].qty);
+        }
 
-}
+}}
 int main()
 {
 int choice;
@@ -71,7 +83,7 @@ int choice;
  struct pizza p[n];
  printf("\nEnter the max no of orders:\t");
  scanf("%d",&n);
- printf("\n PIZZA PARLOR");
+ printf("\n PIZZA PARLOR USING CIRCULAR QUEUE");
     printf("\n 1.PLACE ORDER \n 2.DISPATCH ORDER\n 3.PENDING ORDERS \n 4.EXIT");
     do
     {
@@ -86,12 +98,12 @@ int choice;
             }
             case 2:
             {
-                dispatch_order(p);
+                dispatch_order(p,n);
                 break;
             }
             case 3:
             {
-                display(p);
+                display(p,n);
                 break;
             }
             case 4:
@@ -109,6 +121,3 @@ int choice;
     }
     while(choice!=4);
 }
-
-
-

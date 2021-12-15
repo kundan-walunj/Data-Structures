@@ -1,202 +1,223 @@
-//infix to postfix useing stack
-#include<stdio.h>
-#include<string.h>
-char stack[100],x,stack1[50][50];
-int choice,n,i,top=-1;
-void push(char x)
-{
-    if(top>=n-1)
-    {
-        printf("\n\tSTACK is over flow");
+#include <stdio.h>
+#include <stdlib.h>
 
-    }
-    else
-    {
-        top++;
-        stack[top]=x;
-    }
-}
-char pop()
+struct node{
+int data;
+struct node *next;
+};
+struct node *head;
+
+
+void create(int item)
 {
-    char k;
-    if(top<=-1)
+    struct node *ptr=(struct node*)malloc(sizeof(struct node));//allocate memory in heap( data type and size to allocate)
+    struct node *temp;
+    ptr->data=item;
+    if(head==NULL)//for first element
     {
-        printf("\n\t Stack is EMPTY");
+        ptr->next=NULL;
+        head=ptr;
     }
-    else
-    {   k=stack[top];
-        top--;
+    else// not first element
+    {
+        temp=head;
+        while(temp->next!=NULL)
+        {
+            temp=temp->next;
+        }
+        temp->next=ptr;//temp nextrdf points to new node
+        ptr->next=NULL;//new node pointer becomes null
     }
-    return k;
 }
 void display()
 {
-    if(top>=0)
+    struct node *ptr;
+    ptr=head;
+    if(ptr==NULL)
     {
-        printf("\n The elements in STACK \n");
-        for(i=top; i>=0; i--)
-            printf("\n%c",stack[i]);
+        printf("link list empty\n");
     }
     else
     {
-        printf("\n The STACK is empty");
+        printf("Elements of link list are:\n");
+        while(ptr!=NULL)
+        {
+            printf("\t%d\n",ptr->data);
+            ptr=ptr->next;
+        }
     }
-
 }
-int icp(char ch){
-if(ch=='+'|| ch=='-')
-    return 1;
-if(ch=='*'|| ch=='/')
-    return 2;
-if(ch=='^')
-    return 4;
-if(ch=='(')
-    return 5;
-else
-    return 0;
-}
-int isp(char ch){
-if(ch=='+'|| ch=='-')
-    return 1;
-if(ch=='*'|| ch=='/')
-    return 2;
-if(ch=='^')
-    return 3;
-else
-    return 0;
-}
-
-int postfix(char infix_input[])
+int length()
 {
-char postfix[50],token,elem;
-int i=0,k=0;
-push('#');
-while( (token=infix_input[i++]) != '\0')
+    int count=0;
+    struct node *ptr;
+    ptr=head;
+    while(ptr!=NULL)
+        {
+            count++;
+            ptr=ptr->next;
+        }
+        printf("length of link list is:\n");
+        printf("%d\n",count);
+        return;
+
+}
+
+void insertion(int item,int pos)
+{
+   struct node *ptr=(struct node*)malloc(sizeof(struct node));
+   struct node *temp;
+   int i;
+   ptr->data=item;
+   temp=head;
+   for(i=0;i<pos-1;i++)
+   {
+       temp=temp->next;
+       if(temp==NULL)
+       {
+           printf("can't insert\n");
+           return;
+       }
+   }//temp point to one position less
+   ptr->next=temp->next;//temp next contain next location add is stored in new node next
+   temp->next=ptr;//temp next(pev node) address of new node(ptr) is stored
+
+   printf("Node inserted\n");
+}
+void delete(int pos)
+{
+   struct node *ptr1,*ptr2;
+   ptr1=head;
+   for(int i=0;i<pos;i++)
+   {
+       ptr2=ptr1;//ptr2 points to previous node and ptr1 to delete node
+       ptr1=ptr1->next;
+       if(ptr1==NULL)
+       {
+           printf("There are less elements than %d\n",pos);
+           return;
+       }
+   }
+   ptr2->next=ptr1->next; //address of front node is stored in previous node
+   free(ptr1); //deallocate memory
+   printf("Deleted %d node\n",pos);
+}
+void sortList() {
+                       //Node current will point to head
+        struct node *current = head, *index = NULL;
+        int temp;
+
+            while(current != NULL) {
+                                                //Node index will point to node next to current
+                index = current->next;
+
+            while(index != NULL) {
+                                              //If current node's data is greater than index's node data, swap the data between them
+            if(current->data > index->data) {
+            temp = current->data;
+            current->data = index->data;
+            index->data = temp;
+            }
+            index = index->next;
+            }
+            current = current->next;
+            }
+        printf("The sorted list is:\n");
+        display();
+        }
+void reverse()
+{
+    struct node *p, *q, *r;
+
+    p = q = r =head;
+    p = p->next->next;//points to third pos
+    q = q->next;//points to second pos
+    r->next = NULL;
+    q->next = r;//q next point to prev node
+
+    while (p != NULL)
     {
-        if( token == '(') push(token);
-        else
-            if(token>='a'&&token<='z') postfix[k++]=token;//operand
-            else
-                if( token == ')')
-                {
-                    while( stack[top] != '(')
-                        postfix[k++]=pop();
-                    elem=pop();
-                }
-                else
-                { //operator
-                    while( isp(stack[top]) >= icp(token))
-                        postfix[k++]=pop();
-                    push(token);
-                }
+        r = q;//inc r
+        q = p;//inc q
+        p = p->next;//inc p
+        q->next = r;
     }
-    while( stack[top] != '#')
-        postfix[k++]=pop();
-    postfix[k]='\0';
-    printf("\nPostfix Expression =  %s\n",postfix);
+    head = q;
+    display();
 }
-//postfix to infix
-void push1(char str1[50]){
-top++;
-strcpy(stack1[top],str1);
-}
-char *pop1()
-{
-    char* temp=stack1[top];
-    top--;
-    return(temp);
-}
-void post_infix(char tkn[30])
-{
-	char str1[20],str[20],op1[20],op2[20],str2[20];
-	int i,l;
-	for(i=0;tkn[i]!='\0';i++)
-	{
-		if(tkn[i]=='+'||tkn[i]=='-'||tkn[i]=='*'||tkn[i]=='/')
-		{
-			strcpy(op1,pop1());//operand 1 in op1
-			strcpy(op2,pop1());//operand 2 in op2
-			str2[0]='\0';
-			str2[0]='(';   //bracket at first index of str2
-			str2[1]='\0';
-			strcat(str2,op2); //concat  str2 and first oprand
-			l=strlen(str2);   //store length of str2 in l
-			str2[l]=tkn[i];   //store operator at lth position
-			str2[l+1]='\0';
-			strcat(str2,op1); //concat str2 and second oprand
-			l=strlen(str2);   //store length of str2
-			str2[l]=')';      //store bracket at index position l
-			str2[l+1]='\0';
-			push1(str2);
-		}
-		else
-		{
-			str1[0]='\0';
-			str1[0]=tkn[i]; //store operand in str1
-			str1[1]='\0';
-			push1(str1);
-		}
-	}
-	strcpy(str1,pop1());
-	printf("\nInfix Expression is: %s\n",str1);
-}
+
 int main()
 {
-    char infix_input[100];
-    char exp[100];
-    printf("\n Enter the size of STACK:");
-    scanf("%d",&n);
-    printf("\n STACK OPERATIONS ");
-    printf("\n 1.PUSH\n 2.POP\n 3.DISPLAY\n 4.INFIX TO POSTFIX\n 5.POSTFIX TO INFIX\n 6.EXIT");
-    do
+int p,num,num1,p1,del,m1,m2,merge;
+int choice,ch;
+printf("---OPERATION ON LINKLIST---\n");
+printf(" 1.Insert\n 2.Display\n 3.Length\n 4.Insert(Position)\n 5.Delete(Position)\n 6.Sorting\n 7.reverse\n 8.merge link list\n 9.Exit\n");
+ do
     {
-        printf("\n Enter the Choice:");
+        printf("Enter the Choice:\n");
         scanf("%d",&choice);
         switch(choice)
         {
             case 1:
             {
-               printf(" Enter a character to be pushed:");
-               scanf(" %c",&x);
-                push(x);
+                printf("Enter the element to insert:\n");
+                scanf("%d",&num);
+                create(num);
                 break;
             }
             case 2:
             {
-                char o;
-                o=pop();
+                display();
                 break;
             }
             case 3:
             {
-                display();
+                length();
                 break;
             }
             case 4:
                 {
-                 printf("enter the expression:\n");
-                 scanf(" %s",infix_input);
-                 postfix(infix_input);
+                 printf("Enter the element to insert:\n");
+                 scanf("%d",&num1);
+                 printf("Enter the position:\n");
+                 scanf("%d",&p1);
+                 insertion(num1,p1);
                  break;
                 }
             case 5:
                 {
-                 printf("enter the expression:\n");
-                 scanf(" %s",exp);
-                 post_infix(exp);
+                 printf("Enter the position to delete:\n");
+                 scanf("%d",&del);
+                 delete(del);
                  break;
                 }
             case 6:
+                {
+                    sortList();
+                    break;
+                }
+            case 7:
+                {
+                    reverse();
+                    break;
+                }
+
+            case 9:
             {
-                printf("\n EXIT \n THANK YOU");
+                printf(" EXIT \n THANK YOU\n");
                 break;
             }
             default:
             {
-                printf ("\n\t Please Enter a Valid Choice(1/2/3/4)");
+                printf ("\n\t Please Enter a Valid Choice\n");
             }
 
         }
     }
-    while(choice!=6);
+    while(choice!=9);
 }
+
+
+
+
+
